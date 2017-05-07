@@ -1,0 +1,27 @@
+\chapter{Treść projektu}
+\section{Zmodyfikowany algorytm ewolucji różnicowej}
+\textit{W ramach projektu należy przygotować implementację zmodyfikowanego algorytmu ewolucji różnicowej korzystającego z zapisanej historii populacji oraz punktu środkowego (metoda DES - dokładny opis w artykule). Kod trzeba przygotować w formie biblioteki, a przeprowadzić jego testy na wybranym zestawie zadań optymalizacji. Za wybranie projektu można otrzymać dodatkowe 5 pkt.}
+
+\chapter{Specyfikacja zadania}
+\section{Opis zagadnienia}
+Zagadnienie polega na implementacji zmodyfikowanego algorytmu ewolucji różnicowej. Algorytm zostanie wstępnie zaimplementowany w języku R, jednakże w razie trudnych do przewidzenia na wstępie trudności możliwe, że końcowa implementacja zostanie wykonana w języku C++ bądź Python i jedynie skompilowana do pakietu R. Z pakietu dostępna będzie pojedyncza funkcja, która najprawdopodobniej będzie przyjmowała następujące parametry:
+\begin{itemize}
+\item[--] funkcję celu $q$
+\item[--] rozmiar populacji $\lambda$
+\item[--] wielkość potomstwa $\mu$
+\item[--] współczynnik skalowania $F$
+\item[--] współczynnik migracji punktu środkowego populacji $c$
+\item[--] długość horyzontu $H$
+\item[--] natężenie szumu $\epsilon$
+\item[--] opcjonalne ograniczenia przestrzeni przeszukiwania
+\end{itemize}
+
+Warunek stopu będzie obliczany tak jak w artykule zgodnie z równaniem (14) i ogólnym opisem z sekcji V.
+
+Ograniczenia zostaną wprowadzone zgodnie z równaniami (10--11) z sekcji IV\@.
+
+Dla zaprezentowania wyników oraz na potrzeby testów wybrany został zestaw benchmarkowy CEC 2017 (single objective bound constrained case). Taki wybór pozwoli nam na porównanie otrzymanych wyników z zawartymi w artykule oraz ewentualnie innymi publikacjami zgłoszonymi do konkursu i bardziej poinformowaną dyskusję otrzymanych wyników. Ze względu na szeroki zakres dostępnych testów ich zakres może zostać ograniczony czasem obliczeń, ale przewidujemy taką możliwość jedynie w ostateczności.
+
+\section{Planowane testy}
+Na zestawie benchmarkowym CEC 2017 planowane jest sprawdzenie zarówno jakości otrzymywanych przez algorytm rozwiązań jak również uzyskiwanych przez niego czasów. Najprawdopodobniej jako interfejs do zestawu testów wykorzystany zostanie pakiet mgr. Jagodzińskiego \verb+cec2017+.
+
