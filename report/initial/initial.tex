@@ -3,6 +3,20 @@
 \textit{W ramach projektu należy przygotować implementację zmodyfikowanego algorytmu ewolucji różnicowej korzystającego z zapisanej historii populacji oraz punktu środkowego (metoda DES --- dokładny opis w artykule). Kod trzeba przygotować w formie biblioteki, a przeprowadzić jego testy na wybranym zestawie zadań optymalizacji. Za wybranie projektu można otrzymać dodatkowe 5 pkt.}
 
 \chapter{Specyfikacja zadania}
+\section{Wyjaśnienie algorytmu}
+Algorytm DES w uproszczeniu można uznać za algorytm pośredni do CMA-ES oraz ewolucji różnicowej. Podobnie jak CMA-ES algorytm ten przemieszcza populację w kierunku wyznaczonym ze średniej populacji do średniej pewnej grupy najlepszych osobników, wykorzystuje też różnicę między wylosowanymi osobnikami z populacji podobnie do ewolucji różnicowej.
+
+W skrócie algorytm można opisać w następujących punktach:
+
+    1. Inicjalizacja parametrów i populacji początkowej.
+    2. Obliczenie średniej z populacji.
+    3. Sortowanie osobników populacji zgodnie z funkcją celu.
+    4. Obliczenie średniej z $\mu$ najlepszych osobników.
+    5. Aktualizacja każdego z osobników w oparciu o obliczone średnie, parametry \{$c$, $F$\}, pewne zmienne losowe o danych rozkładach oraz zadany szum.
+    6. W wypadku nieosiągnięcia warunku stopu powrót do punktu drugiego.
+
+Warto także dodać, że w wypadku optymalizacji z ograniczeniami są one dodawane poprzez przypisanie punktom z poza obszaru poszukiwań największej napotkanej dotychczas wewnątrz obszaru wartości powiększonej o sumę kwadratów odległości od ograniczeń dla wymiarów, w których ograniczenia zostały przekroczone.
+
 \section{Opis zagadnienia}
 Zagadnienie polega na implementacji zmodyfikowanego algorytmu ewolucji różnicowej. Algorytm zostanie wstępnie zaimplementowany w języku R, jednakże w razie trudnych do przewidzenia na wstępie trudności możliwe, że końcowa implementacja zostanie wykonana w języku C++ bądź Python i jedynie skompilowana do pakietu R. Z pakietu dostępna będzie pojedyncza funkcja, która najprawdopodobniej będzie przyjmowała następujące parametry:
 
