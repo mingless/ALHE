@@ -4,18 +4,20 @@
 
 \chapter{Specyfikacja zadania}
 \section{Wyjaśnienie algorytmu}
-Algorytm DES w uproszczeniu można uznać za algorytm pośredni do CMA-ES oraz ewolucji różnicowej. Podobnie jak CMA-ES algorytm ten przemieszcza populację w kierunku wyznaczonym ze średniej populacji do średniej pewnej grupy najlepszych osobników, wykorzystuje też różnicę między wylosowanymi osobnikami z populacji podobnie do ewolucji różnicowej.
+Algorytm DES w uproszczeniu można uznać za pośredni do CMA-ES oraz ewolucji różnicowej. Podobnie jak CMA-ES algorytm ten przemieszcza populację w kierunku wyznaczonym ze średniej populacji do średniej pewnej grupy najlepszych osobników, wykorzystuje też różnicę między wylosowanymi osobnikami z populacji podobnie do ewolucji różnicowej.
 
 W skrócie algorytm można opisać w następujących punktach:
 
-    1. Inicjalizacja parametrów i populacji początkowej.
-    2. Obliczenie średniej z populacji.
-    3. Sortowanie osobników populacji zgodnie z funkcją celu.
-    4. Obliczenie średniej z $\mu$ najlepszych osobników.
-    5. Aktualizacja każdego z osobników w oparciu o obliczone średnie, parametry \{$c$, $F$\}, pewne zmienne losowe o danych rozkładach oraz zadany szum.
-    6. W wypadku nieosiągnięcia warunku stopu powrót do punktu drugiego.
+\begin{enumerate}
+    \item Inicjalizacja parametrów i populacji początkowej.
+    \item Obliczenie średniej z populacji.
+    \item Sortowanie osobników populacji zgodnie z funkcją celu.
+    \item Obliczenie średniej z $\mu$ najlepszych osobników.
+    \item Aktualizacja każdego z osobników w oparciu o obliczone średnie, parametry \{$c$, $F$\}, pewne zmienne losowe o danych rozkładach oraz zadany szum.
+    \item W wypadku nieosiągnięcia warunku stopu powrót do punktu drugiego.
+\end{enumerate}
 
-Warto także dodać, że w wypadku optymalizacji z ograniczeniami są one dodawane poprzez przypisanie punktom z poza obszaru poszukiwań największej napotkanej dotychczas wewnątrz obszaru wartości powiększonej o sumę kwadratów odległości od ograniczeń dla wymiarów, w których ograniczenia zostały przekroczone.
+W wypadku optymalizacji z ograniczeniami są one dodawane poprzez przypisanie punktom z poza obszaru poszukiwań największej napotkanej dotychczas wewnątrz obszaru wartości powiększonej o sumę kwadratów odległości od ograniczeń dla wymiarów, w których ograniczenia zostały przekroczone.
 
 \section{Opis zagadnienia}
 Zagadnienie polega na implementacji zmodyfikowanego algorytmu ewolucji różnicowej. Algorytm zostanie wstępnie zaimplementowany w języku R, jednakże w razie trudnych do przewidzenia na wstępie trudności możliwe, że końcowa implementacja zostanie wykonana w języku C++ bądź Python i jedynie skompilowana do pakietu R. Z pakietu dostępna będzie pojedyncza funkcja, która najprawdopodobniej będzie przyjmowała następujące parametry:
@@ -23,8 +25,8 @@ Zagadnienie polega na implementacji zmodyfikowanego algorytmu ewolucji różnico
 \begin{itemize}
 \item[--] funkcję celu $q$
 \item[--] rozmiar populacji $\lambda$
-\item[--] wielkość potomstwa $\mu$
-\item[--] współczynnik skalowania $F$
+\item[--] rozmiar potomstwa $\mu$
+\item[--] współczynnik skalowania $F$ - podany algorytm sugeruje wartość $ \frac{1}{\sqrt{2}} $, możliwe jest więc jego pominięcie
 \item[--] współczynnik migracji punktu środkowego populacji $c$
 \item[--] długość horyzontu $H$
 \item[--] natężenie szumu $\epsilon$
@@ -32,15 +34,16 @@ Zagadnienie polega na implementacji zmodyfikowanego algorytmu ewolucji różnico
 \end{itemize}
 
 
-Warunek stopu będzie obliczany tak jak w artykule zgodnie z równaniem (14) i ogólnym opisem z sekcji V.
+Warunek stopu zgodnie z artykułem zostanie aktywowany, kiedy zmiany w populacji będą głównie powodowane głównie współczynnikiem losowym albo po wykonaniu pewnej maksymalnej liczbie ewaluacji funkcji celu.
 
+\section{Dobieranie parametrów}
 
-Ograniczenia zostaną wprowadzone zgodnie z równaniami (10--11) z sekcji IV artykułu.
-
-
-Dla zaprezentowania wyników oraz na potrzeby testów wybrany został zestaw benchmarkowy CEC 2017 (single objective bound constrained case). Taki wybór pozwoli nam na porównanie otrzymanych wyników z zawartymi w artykule oraz ewentualnie innymi publikacjami zgłoszonymi do konkursu i bardziej poinformowaną dyskusję otrzymanych wyników. Ze względu na szeroki zakres dostępnych testów ich zakres może zostać ograniczony czasem obliczeń, ale przewidujemy taką możliwość jedynie w ostateczności.
+Z wymienionych powyżej parametrów funkcji, dla danego zagadnienia niezbędne bedzie wyznaczenie znacznej ilości parametrów - $\lambda$, $\mu$, $c$, $H$, $\epsilon$. Najprawdopodobniej zostanie do wykonane przy pomocy kolejnej optymalizacji - zostanie wybrany stosunkowo małe zagadnienie testowe, dla którego uruchomiony będzie optymalizator z bliżej jeszcze nieokreśloną funkcją celu. Prawdopodobnie będzie ona brała pod uwagę kilka współczynników, takich jak czas zbieżności i wartości funkcji celu (odporność na ekstrema lokalne).
 
 \section{Planowane testy}
+
+Dla zaprezentowania wyników oraz na potrzeby testów wybrany został zestaw benchmarkowy CEC 2017 (single objective bound constrained case). Taki wybór pozwoli nam na porównanie otrzymanych wyników z zawartymi w artykule oraz ewentualnie innymi publikacjami zgłoszonymi do konkursu i bardziej poinformowaną dyskusję otrzymanych wyników. Ze względu na ilość i złożoność dostępnych testów istnieje znaczna szansa, że wykorzystany ich zakres będzie ograniczony czasem obliczeń.
+
 Na zestawie benchmarkowym CEC 2017 planowane jest sprawdzenie zarówno jakości otrzymywanych przez algorytm rozwiązań jak również uzyskiwanych przez niego czasów. Najprawdopodobniej jako interfejs do zestawu testów wykorzystany zostanie pakiet mgr. Jagodzińskiego \verb+cec2017+.
 
 Zestaw ten zawiera większość standardowych funkcji takich jak funkcje Rosebrocka, Zahkarova czy Levy'ego. Na potrzeby testów planowane jest wykorzystanie ok. 10 z dostępnych funkcji.
