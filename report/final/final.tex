@@ -1,0 +1,64 @@
+\chapter{Treść projektu}
+\section{Zmodyfikowany algorytm ewolucji różnicowej}
+\textit{W ramach projektu należy przygotować implementację zmodyfikowanego algorytmu ewolucji różnicowej korzystającego z zapisanej historii populacji oraz punktu środkowego (metoda DES --- dokładny opis w artykule). Kod trzeba przygotować w formie biblioteki, a przeprowadzić jego testy na wybranym zestawie zadań optymalizacji. Za wybranie projektu można otrzymać dodatkowe 5 pkt.}
+
+\chapter{Dokumentacja końcowa}
+\section{Wyjaśnienie algorytmu}
+Algorytm DES w uproszczeniu można uznać za pośredni do CMA-ES oraz ewolucji różnicowej. Podobnie jak CMA-ES algorytm ten przemieszcza populację w kierunku wyznaczonym ze średniej populacji do średniej pewnej grupy najlepszych osobników, wykorzystuje też różnicę między wylosowanymi osobnikami z populacji podobnie do ewolucji różnicowej.
+
+W skrócie algorytm można opisać w następujących punktach:
+
+\begin{enumerate}
+    \item Inicjalizacja parametrów i populacji początkowej.
+    \item Obliczenie średniej z populacji.
+    \item Sortowanie osobników populacji zgodnie z funkcją celu.
+    \item Obliczenie średniej z $\mu$ najlepszych osobników.
+    \item Aktualizacja każdego z osobników w oparciu o obliczone średnie, parametry \{$c$, $F$\}, pewne zmienne losowe o danych rozkładach oraz zadany szum.
+    \item W wypadku nieosiągnięcia warunku stopu powrót do punktu drugiego.
+\end{enumerate}
+
+W wypadku optymalizacji z ograniczeniami są one dodawane poprzez przypisanie punktom z poza obszaru poszukiwań największej napotkanej dotychczas wewnątrz obszaru wartości powiększonej o sumę kwadratów odległości od ograniczeń dla wymiarów, w których ograniczenia zostały przekroczone.
+
+\section{Implementacja algorytmu}
+Zgodnie z założeniem algorytm zaimplementowany został w języku R i dostępny jest z poziomu zbudowanego pakietu. Elementy pamięciowe algorytmu przechowywane są w listach, pozwala to na prostą i intuicyjną implementację, aczkolwiek możliwe, że wybranie list zamiast macierzy negatywnie wpłynęło na wydajność implementacji. Końcowa implementacja przyjmuje podane pierwotnie parametry t.j.:
+
+\begin{itemize}
+\item[--] funkcję celu $q$
+\item[--] rozmiar populacji $\lambda$
+\item[--] rozmiar potomstwa $\mu$
+\item[--] współczynnik skalowania $F$
+\item[--] współczynnik migracji punktu środkowego populacji $c$
+\item[--] długość horyzontu $H$
+\item[--] natężenie szumu $\epsilon$
+\item[--] opcjonalne ograniczenia przestrzeni przeszukiwania
+\end{itemize}
+
+W obecnej formie parametry inicjalizowane są z rozkładem jednostajnym, w prosty sposób można jednak dokonać inicjalizacji inną metodą.
+
+\section{Przeprowadzone testy}
+Pierwotnie planowane było przeprowadzenie strojenia parametrów algorytmu DES na zbiorze testowym, niestety skończona implementacja obudowana algorytmem GA w celu optymalizacji parametrów potrzebowała ponad 25 minut na przeprowadzenie jednej iteracji algorytmu DES. Uwzględniając konieczność wykonania co najmniej 10--20 iteracji algortymu DES w pojedynczej iteracji algorytmu GA oraz konieczność przeprowadzenia optymalizacji na więcej niż jednej funkcji otrzymaliśmy przewidywany czas obliczeń znacznie wykraczający poza nasze możliwości. Po przeprowadzeniu dalszych testów ustaliliśmy, że w zakresie naszych możliwości będzie sprawdzenie algorytmu z parametrami zadanymi w artykule na zbiorze 5 funkcji 10-wymiarowych w 10 iteracjach oraz zachowania algorytmu w pojedynczych eksperymentach.
+
+Poniżej zamieszczono wyniki statystyk z 10 iteracji dla funkcji z zestawu CEC2017.
+
+\begin{table}[h]
+\caption{Wyniki dla funkcji 10-wymiarowych}
+\label{t1}
+\centering
+\sisetup{table-format = 1.4e-1}
+\begin{small}
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \multicolumn{1}{|c|}{Funkcja\rule{0pt}{3.5mm}} & Najlepszy & Najgorszy & Mediana & Średnia & Odchylenie \\ \hline
+        2\rule{0pt}{3.5mm}    &       0.00e+00  &   1.00e+00    & 0.00e+00   & 0.00e+00    & 4.47e-01  \\
+        4                     &       2.82e+00  &   9.98e-09    & 9.18e-09   & 8.00e-09    & 2.94e-09   \\
+        7                     &       1.32e+01  &   1.62e+01    & 1.43e+01   & 1.45e+01    & 1.15e+00   \\
+        17                    &       2.29e+01  &   2.93e+01    & 2.54e+01   & 2.57e+01    & 2.62e+00   \\
+        23                    &       3.04e+02  &   3.11e+02    & 3.09e+02   & 3.08e+02    & 2.70e+00   \\
+    \end{tabular}
+\end{small}
+\end{table}
+
+\includegraphics{./example.pdf}
+\includegraphics{./lownoise.pdf}
+\includegraphics{./highnoise.pdf}
+
