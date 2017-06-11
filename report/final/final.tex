@@ -17,30 +17,62 @@ W skrócie algorytm można opisać w następujących punktach:
     \item W wypadku nieosiągnięcia warunku stopu powrót do punktu drugiego.
 \end{enumerate}
 
-W wypadku optymalizacji z ograniczeniami są one dodawane poprzez przypisanie punktom z poza obszaru poszukiwań największej napotkanej dotychczas wewnątrz obszaru wartości powiększonej o sumę kwadratów odległości od ograniczeń dla wymiarów, w których ograniczenia zostały przekroczone.
+W projekcie nie zaimplementowano stosowania ograniczeń. Można je za to uwzględnić przy stosowaniu naszej funkcji odpowiednio modyfikując funkcję celu - tj. dodać do niej pewną karę przy przekroczeniu granic.
 
 \section{Implementacja algorytmu}
-Zgodnie z założeniem algorytm zaimplementowany został w języku R i dostępny jest z poziomu zbudowanego pakietu. Elementy pamięciowe algorytmu przechowywane są w listach, pozwala to na prostą i intuicyjną implementację, aczkolwiek możliwe, że wybranie list zamiast macierzy negatywnie wpłynęło na wydajność implementacji. Końcowa implementacja przyjmuje podane pierwotnie parametry t.j.:
+Zgodnie z założeniem algorytm zaimplementowany został w języku R i dostępny jest z poziomu zbudowanego pakietu. Elementy pamięciowe algorytmu przechowywane są w listach, pozwala to na prostą i intuicyjną implementację, aczkolwiek możliwe, że wybranie list zamiast macierzy negatywnie wpłynęło na wydajność implementacji. Końcową implementację można zobaczyć w pliku źródłowym \verb|des.R| zamieszczonym w przesłanej bibliotece. Są tam zapisane dwie funkcje - przykładową funkcję inicjalizacji populacji początkowej \verb|desUniformInit| i właściwego algorytmu \verb|des|. Szczegóły przyjmowanych parametrów zostały zapisane w dokumentacji biblioteki, którą można obejrzeć za pomocą komendy \verb|?<funkcja>|.
 
+W implementacji algorytmu zezwolono na ręczne ustawienie następujących parametrów, oprócz tych definiujących samą funkcję celu:
 \begin{itemize}
-\item[--] funkcję celu $q$
-\item[--] rozmiar populacji $\lambda$
-\item[--] rozmiar potomstwa $\mu$
+\item[--] rozmiar całkowitej populacji $ \lambda $
+\item[--] rozmiar potomstwa/elity $\mu$
 \item[--] współczynnik skalowania $F$
 \item[--] współczynnik migracji punktu środkowego populacji $c$
-\item[--] długość horyzontu $H$
+\item[--] długość historii populacji $H$
 \item[--] natężenie szumu $\epsilon$
-\item[--] opcjonalne ograniczenia przestrzeni przeszukiwania
+\item[--] zmiana funkcji generującej populację początkową
+\item[--] wstępna przestrzeń przeszukiwania stosowana przy domyślnej generacji początkowej populacji
+\item[--] warunki stopu - maksymalna ilość iteracji i minimalna dopuszczalna wartość funkcji celu
 \end{itemize}
 
-W obecnej formie parametry inicjalizowane są z rozkładem jednostajnym, w prosty sposób można jednak dokonać inicjalizacji inną metodą.
+Większość z podanych algorytmów ustalono na wartości domyślne pobrane z podanego w poleceniu artykułu - tj. wartości stosowanych w połączeniu z funkcjami benchmarkowymi CEC2017.
 
-\section{Przeprowadzone testy}
-Pierwotnie planowane było przeprowadzenie strojenia parametrów algorytmu DES na zbiorze testowym, niestety skończona implementacja obudowana algorytmem GA w celu optymalizacji parametrów potrzebowała ponad 25 minut na przeprowadzenie jednej iteracji algorytmu DES. Uwzględniając konieczność wykonania co najmniej 10--20 iteracji algortymu DES w pojedynczej iteracji algorytmu GA oraz konieczność przeprowadzenia optymalizacji na więcej niż jednej funkcji otrzymaliśmy przewidywany czas obliczeń znacznie wykraczający poza nasze możliwości. Po przeprowadzeniu dalszych testów ustaliliśmy, że w zakresie naszych możliwości będzie sprawdzenie algorytmu z parametrami zadanymi w artykule na zbiorze 5 funkcji 10-wymiarowych w 10 iteracjach oraz zachowania algorytmu w pojedynczych eksperymentach.
+\section{Działanie algorytmu}
+Działanie algorytmu można zaobserwować na poniższych wykresach, na funkcjach dwuargumentowych celem łatwiejszej reprezentacji wyników.
 
-Poniżej zamieszczono wyniki statystyk z 10 iteracji dla funkcji z zestawu CEC2017.
+Na rysunku \ref{R1} przedstawiono przykładową optymalizację funkcji michalewicza. Można zobaczyć ją samemu uruchamiając zamieszczone w bibliotece demo \verb|simple_demo.R| - można ujrzeć wtedy na własnym  wykresie wynik działania funkcji i ewentualnie poeksperymentować z parametrami algorytmu.
 
-\begin{table}[h]
+\begin{figure}
+\includegraphics{./example.pdf}
+\caption{Optymalizacja funkcji michalewicza za pomocą DES. Stosowane niedomyślne parametry: $ H = 12 $, $ \epsilon = \num{1e-1} $, $ c = 0.6 $, iteracje$ =100 $}
+\label{R1}
+\end{figure}
+
+Uruchomienie tego dema nie skutkuje w każdym przypadku zbiegnięciem się do zera globalnego znajdującego się w punkcie $ (2.20,1.57) $ - wynika to z połączenia małego stosowanego współczynnika błędu, wysokiej losowości rozmieszczenia wstępnej populacji, a także bardzo małej ilości iteracji. Można jednak zauważyć, że generalna populacja po wpadnięciu w jedną z dolin zaczyna ją eksplorować aż do znalezienia większego minimum, którego okolicę wtedy zaczyna eksploatować.
+
+Inne przykłady przedstawiono na rysunkach \ref{R2} i \ref{R3}. Na obu z nich widać optymalizację funkcji levy'ego z inicjalizacją w małym kwadracie $ x \in (-10,-9), y\in (-10,-9) $. Służy to zaprezentowaniu możliwości utykania w lokalnym minimum przy niefortunnym usytuowaniu początkowym (czemu częściowo zapobiega zastosowanie większej wartości parametru $ H $, powiększającym pulę osobników używanych do reprodukcji). Na rysunku \ref{R2}, przy zastosowaniu $ \epsilon = \num{1e-1} $ funkcja utyka w minimum lokalnym. Na \ref{R3}, przy większym szumie $ \epsilon = \num{1} $ funkcja jest w stanie w zniego wyjść i zacząć eksploatować właściwe minimum funkcji.
+ 
+\begin{figure}
+	\includegraphics{./lownoise.pdf}
+	\caption{Optymalizacja funkcji levy'ego za pomocą DES. Stosowane niedomyślne parametry: $ \epsilon = \num{1e-1} $, $ c = 0.9 $, iteracje$ =4000 $}
+	\label{R2}
+\end{figure}
+
+
+\begin{figure}
+	\includegraphics{./highnoise.pdf}
+	\caption{Optymalizacja funkcji levy'ego za pomocą DES. Stosowane niedomyślne parametry: $ \epsilon = \num{1e0} $, $ c = 0.9 $, iteracje = $4000 $}
+	\label{R3}
+\end{figure}
+
+\section{Przeprowadzone testy na zbiorze CEC2017}
+
+
+Pierwotnie planowane było przeprowadzenie strojenia parametrów algorytmu DES na zbiorze testowym, niestety skończona implementacja obudowana algorytmem GA w celu optymalizacji (z kilkoma parametrami całkowitoliczbowymi) potrzebowała znacznie zbyt dużo czasu do wykonania pojedyncze uruchomienie DES na problemie z CEC2017 z zastosowaniem \num{100000} iteracji wymagało około 20 minut. Uwzględniając konieczność wykonania co najmniej 10--20 uruchomień algortymu DES w pojedynczej iteracji algorytmu GA oraz konieczność przeprowadzenia optymalizacji na więcej niż jednej funkcji otrzymaliśmy przewidywany czas obliczeń znacznie wykraczający poza nasze możliwości. Po przeprowadzeniu dalszych testów ustaliliśmy, że w zakresie naszych możliwości będzie sprawdzenie algorytmu z parametrami zadanymi w artykule, na zbiorze 5 funkcji 10-wymiarowych w 10 iteracjach.
+
+Poniżej zamieszczono wyniki statystyk z 10 iteracji dla kilku losowo wybranych funkcji z zestawu CEC2017. Tak jak zaproponowano w definicji konkursu CEC, wartości poniżej rzędu e-09 lub mniejszego zostały zastąpione zerami.
+
+\begin{table}[ht]
 \caption{Wyniki dla funkcji 10-wymiarowych}
 \label{t1}
 \centering
@@ -48,17 +80,15 @@ Poniżej zamieszczono wyniki statystyk z 10 iteracji dla funkcji z zestawu CEC20
 \begin{small}
     \begin{tabular}{|c|c|c|c|c|c|}
         \hline
-        \multicolumn{1}{|c|}{Funkcja\rule{0pt}{3.5mm}} & Najlepszy & Najgorszy & Mediana & Średnia & Odchylenie \\ \hline
-        2\rule{0pt}{3.5mm}    &       0.00e+00  &   1.00e+00    & 0.00e+00   & 0.00e+00    & 4.47e-01  \\
-        4                     &       2.82e+00  &   9.98e-09    & 9.18e-09   & 8.00e-09    & 2.94e-09   \\
+        \multicolumn{1}{|c|}{Nr funkcji\rule{0pt}{3.5mm}} & Najlepszy & Najgorszy & Mediana & Średnia & Odchylenie \\ \hline
+        2\rule{0pt}{3.5mm}    &       0  &   1e+00    & 0   & 0    & 4.47e-01  \\
+        4                     &       0  &   0    & 0   & 0    & 0   \\
         7                     &       1.32e+01  &   1.62e+01    & 1.43e+01   & 1.45e+01    & 1.15e+00   \\
         17                    &       2.29e+01  &   2.93e+01    & 2.54e+01   & 2.57e+01    & 2.62e+00   \\
-        23                    &       3.04e+02  &   3.11e+02    & 3.09e+02   & 3.08e+02    & 2.70e+00   \\
+        23                    &       3.04e+02  &   3.11e+02    & 3.09e+02   & 3.08e+02    & 2.70e+00   \\ \hline
     \end{tabular}
 \end{small}
 \end{table}
 
-\includegraphics{./example.pdf}
-\includegraphics{./lownoise.pdf}
-\includegraphics{./highnoise.pdf}
+Jak widać wyniki uzyskane w testach mają rzędy wielkości porównywalne z wynikami uzyskanymi w artykule.
 
